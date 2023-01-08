@@ -9,8 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 object Handler {
-  val readBufSize: Int = 1024;
-  val writeBufSize: Int = 1024;
+  val readBufSize: Int = 1024
+  val writeBufSize: Int = 1024
 }
 
 class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionContext) extends SelKeyAttm {
@@ -27,11 +27,11 @@ class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionConte
   sel.wakeup()
 
   def run(): Try[Unit] = Try {
-    if (selKey.isReadable())
-      read()
-    else if (selKey.isWritable())
-      write()
-  }
+      if (selKey.isReadable())
+        read()
+      else if (selKey.isWritable())
+        write()
+    }
     .recover {
       case e: IOException => println(s"Handler run(): $e")
     }
@@ -54,23 +54,23 @@ class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionConte
     var numBytes: Int = 0
 
     Try {
-      numBytes = channel.read(readBuf)
-      println("Handler read(): #bytes read into 'readBuf' buffer = " + numBytes)
+        numBytes = channel.read(readBuf)
+        println("Handler read(): #bytes read into 'readBuf' buffer = " + numBytes)
 
-      if (numBytes == -1) {
-        selKey.cancel()
-        channel.close()
-        println("Handler read(): client connection might have been dropped!")
-      }
-      else {
-        Future {
-          process()
+        if (numBytes == -1) {
+          selKey.cancel()
+          channel.close()
+          println("Handler read(): client connection might have been dropped!")
         }
-          .recover {
-            case e: IOException => println(s"Handler process(): $e")
-          }
+        else {
+          Future {
+              process()
+            }
+            .recover {
+              case e: IOException => println(s"Handler process(): $e")
+            }
+        }
       }
-    }
       .recover {
         case e: IOException => println(s"Handler read(): $e")
       }
@@ -80,17 +80,17 @@ class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionConte
     var numBytes: Int = 0
 
     Try {
-      numBytes = channel.write(writeBuf)
-      println("Handler write(): #bytes read from 'writeBuf' buffer = " + numBytes)
+        numBytes = channel.write(writeBuf)
+        println("Handler write(): #bytes read from 'writeBuf' buffer = " + numBytes)
 
-      if (numBytes > 0) {
-        readBuf.clear()
-        writeBuf.clear()
+        if (numBytes > 0) {
+          readBuf.clear()
+          writeBuf.clear()
 
-        selKey.interestOps(SelectionKey.OP_READ)
-        selKey.selector().wakeup()
+          selKey.interestOps(SelectionKey.OP_READ)
+          selKey.selector().wakeup()
+        }
       }
-    }
       .recover {
         case e: IOException => println(s"Handler write(): $e")
       }
