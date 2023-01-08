@@ -44,10 +44,10 @@ class NioReactor(port: Int) {
   val sk: SelectionKey = serverChannel.register(selector, SelectionKey.OP_ACCEPT)
   sk.attach(new Acceptor())
 
-  import java.util.{Iterator => javaIter}
+  import java.util.{Iterator => JavaIter}
 
   @scala.annotation.tailrec
-  final def iterateSelKeys(it: javaIter[SelectionKey]): Unit = {
+  final def iterateSelKeys(it: JavaIter[SelectionKey]): Unit = {
     if (it.hasNext()) {
       val sk = it.next()
       it.remove()
@@ -60,7 +60,7 @@ class NioReactor(port: Int) {
   }
 
   @scala.annotation.tailrec
-  final def selectorLoop(iterFn: (javaIter[SelectionKey]) => Unit): Nothing = {
+  final def selectorLoop(iterFn: (JavaIter[SelectionKey]) => Unit): Nothing = {
     selector.select()
     val it = selector.selectedKeys().iterator()
     iterFn(it)
