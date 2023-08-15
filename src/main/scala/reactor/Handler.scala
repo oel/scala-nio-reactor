@@ -37,10 +37,8 @@ class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionConte
     }
 
   def process(): Unit = synchronized {
-    var bytes = Array.empty[Byte]
-
     readBuf.flip()
-    bytes = Array.ofDim[Byte](readBuf.remaining())
+    val bytes: Array[Byte] = Array.ofDim[Byte](readBuf.remaining())
     readBuf.get(bytes, 0, bytes.length)
     print("Handler process(): " + new String(bytes, Charset.forName("ISO-8859-1")))
 
@@ -51,10 +49,8 @@ class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionConte
   }
 
   def read(): Unit = synchronized {
-    var numBytes: Int = 0
-
     Try {
-        numBytes = channel.read(readBuf)
+        val numBytes: Int = channel.read(readBuf)
         println("Handler read(): #bytes read into 'readBuf' buffer = " + numBytes)
 
         if (numBytes == -1) {
@@ -77,10 +73,8 @@ class Handler(sel: Selector, channel: SocketChannel)(implicit ec: ExecutionConte
   }
 
   def write(): Unit = {
-    var numBytes: Int = 0
-
     Try {
-        numBytes = channel.write(writeBuf)
+        val numBytes: Int = channel.write(writeBuf)
         println("Handler write(): #bytes read from 'writeBuf' buffer = " + numBytes)
 
         if (numBytes > 0) {
